@@ -609,7 +609,7 @@ BackgroundColors:
       .db $0f, $22, $0f, $0f ;used by background color control if set
 
 PlayerColors:
-      .db $22, $16, $27, $18 ;mario's colors
+      .db $22, $1e, $22, $29 ;mario's colors
       .db $22, $30, $27, $19 ;luigi's colors
       .db $22, $37, $27, $16 ;fiery (used by both)
 
@@ -2915,7 +2915,7 @@ ProcClimb: ldx Climb_Y_MForceData,y  ;load value here
            stx Player_Y_Speed        ;store as vertical speed
            bmi SetCAnim              ;if climbing down, use default animation timing value
            lsr                       ;otherwise divide timer setting by 2
-SetCAnim:  sta PlayerAnimTimerSet    ;store animation timer setting and leave
+SetCAnim:  nop;sta PlayerAnimTimerSet    ;store animation timer setting and leave
            rts
 
 CheckForJumping:
@@ -3076,7 +3076,7 @@ ProcSkid:   lda Player_XSpeedAbsolute  ;check player's walking/running speed
             sta Player_X_Speed         ;nullify player's horizontal speed
             sta Player_X_MoveForce     ;and dummy variable for player
 SetAnimSpd: lda PlayerAnimTmrData,y    ;get animation timer setting using Y as offset
-            sta PlayerAnimTimerSet
+            nop;sta PlayerAnimTimerSet
             rts
 
 ;-------------------------------------------------------------------------------------
@@ -3091,28 +3091,28 @@ ImposeFriction:
            bmi LeftFrict             ;otherwise logic dictates player moving left, branch to slow
 JoypFrict: lsr                       ;put right controller bit into carry
            bcc RghtFrict             ;if left button pressed, carry = 0, thus branch
-LeftFrict: lda Player_X_MoveForce    ;load value set here
+LeftFrict: lda #$00    ;load value set here
            clc
-           adc FrictionAdderLow      ;add to it another value set here
+           nop;adc FrictionAdderLow      ;add to it another value set here
            sta Player_X_MoveForce    ;store here
-           lda Player_X_Speed
-           adc FrictionAdderHigh     ;add value plus carry to horizontal speed
+           lda #$30
+           nop;adc FrictionAdderHigh     ;add value plus carry to horizontal speed
            sta Player_X_Speed        ;set as new horizontal speed
            cmp MaximumRightSpeed     ;compare against maximum value for right movement
            bmi XSpdSign              ;if horizontal speed greater negatively, branch
-           lda MaximumRightSpeed     ;otherwise set preset value as horizontal speed
+           lda #$30     ;otherwise set preset value as horizontal speed
            sta Player_X_Speed        ;thus slowing the player's left movement down
            jmp SetAbsSpd             ;skip to the end
-RghtFrict: lda Player_X_MoveForce    ;load value set here
+RghtFrict: lda #$00    ;load value set here
            sec
-           sbc FrictionAdderLow      ;subtract from it another value set here
+           nop;sbc FrictionAdderLow      ;subtract from it another value set here
            sta Player_X_MoveForce    ;store here
-           lda Player_X_Speed
-           sbc FrictionAdderHigh     ;subtract value plus borrow from horizontal speed
+           lda #$30
+           nop;sbc FrictionAdderHigh     ;subtract value plus borrow from horizontal speed
            sta Player_X_Speed        ;set as new horizontal speed
            cmp MaximumLeftSpeed      ;compare against maximum value for left movement
            bpl XSpdSign              ;if horizontal speed greater positively, branch
-           lda MaximumLeftSpeed      ;otherwise set preset value as horizontal speed
+           lda #$30        ;otherwise set preset value as horizontal speed
            sta Player_X_Speed        ;thus slowing the player's right movement down
 XSpdSign:  cmp #$00                  ;if player not moving or moving to the right,
            bpl SetAbsSpd             ;branch and leave horizontal speed value unmodified
@@ -4651,8 +4651,8 @@ ProcessPlayerAction:
         beq ActionFalling     ;if falling, branch here
         cmp #$01
         bne ProcOnGroundActs  ;if not jumping, branch here
-        lda SwimmingFlag
-        bne ActionSwimming    ;if swimming flag set, branch elsewhere
+        ldy #$02;mingFlag
+        bne ActionWalkRun;bne ActionSwimming    ;if swimming flag set, branch elsewhere
         ldy #$06              ;load offset for crouching
         lda CrouchingFlag     ;get crouching flag
         bne NonAnimatedActs   ;if set, branch to get offset for graphics table
@@ -4668,8 +4668,8 @@ ProcOnGroundActs:
         ora Left_Right_Buttons     ;and left/right controller bits
         beq NonAnimatedActs        ;if no speed or buttons pressed, use standing offset
         lda Player_XSpeedAbsolute  ;load walking/running speed
-        cmp #$09
-        bcc ActionWalkRun          ;if less than a certain amount, branch, too slow to skid
+        ldy #$00;cmp #$09
+        beq NonAnimatedActs; ActionWalkRun          ;if less than a certain amount, branch, too slow to skid
         lda Player_MovingDir       ;otherwise check to see if moving direction
         and PlayerFacingDir        ;and facing direction are the same
         bne ActionWalkRun          ;if moving direction = facing direction, branch, don't skid
@@ -4714,7 +4714,7 @@ GetCurrentAnimOffset:
         jmp GetOffsetFromAnimCtrl  ;jump to get proper offset to graphics table
 
 FourFrameExtent:
-        lda #$03              ;load upper extent for frame control
+        lda #$04              ;load upper extent for frame control
         jmp AnimationControl  ;jump to get offset and animate player object
 
 ThreeFrameExtent:
@@ -4726,7 +4726,7 @@ AnimationControl:
           pha                       ;save offset to stack
           lda PlayerAnimTimer       ;load animation frame timer
           bne ExAnimC               ;branch if not expired
-          lda PlayerAnimTimerSet    ;get animation frame timer amount
+          lda #$05    ;get animation frame timer amount
           sta PlayerAnimTimer       ;and set timer accordingly
           lda PlayerAnimCtrl
           clc                       ;add one to animation frame control
@@ -4787,32 +4787,33 @@ ShrPlF: lda PlayerGfxTblOffsets,y    ;get offset to graphics table based on offs
         rts                          ;and leave
 
 ChkForPlayerAttrib:
-           ldy Player_SprDataOffset    ;get sprite data offset
-           lda GameEngineSubroutine
-           cmp #$0b                    ;if executing specific game engine routine,
-           beq KilledAtt               ;branch to change third and fourth row OAM attributes
-           lda PlayerGfxOffset         ;get graphics table offset
-           cmp #$50
-           beq C_S_IGAtt               ;if crouch offset, either standing offset,
-           cmp #$b8                    ;or intermediate growing offset,
-           beq C_S_IGAtt               ;go ahead and execute code to change 
-           cmp #$c0                    ;fourth row OAM attributes only
-           beq C_S_IGAtt
-           cmp #$c8
-           bne ExPlyrAt                ;if none of these, branch to leave
-KilledAtt: lda Sprite_Attributes+16,y
-           and #%00111111              ;mask out horizontal and vertical flip bits
+           lda #%01000011;Player_SprDataOffset    ;get sprite data offset
+		   ldy PlayerAnimCtrl;lda GameEngineSubroutine
+		   cpy #$04;cmp #$0b                    ;if executing specific game engine routine,
+           beq Yesflip               ;branch to change third and fourth row OAM attributes
+		   eor #%01000000
+Yesflip:   ;lda PlayerGfxOffset         ;get graphics table offset
+           ;cmp #$50
+           ldy Player_SprDataOffset;beq C_S_IGAtt               ;if crouch offset, either standing offset,
+           ;cmp #$b8                    ;or intermediate growing offset,
+           ;beq C_S_IGAtt               ;go ahead and execute code to change 
+           ;cmp #$c0                    ;fourth row OAM attributes only
+           ;beq C_S_IGAtt
+           ;cmp #$c8
+           ;bne ExPlyrAt                ;if none of these, branch to leave
+KilledAtt: ;lda Sprite_Attributes+16,y
+           ;and #%00111111              ;mask out horizontal and vertical flip bits
            sta Sprite_Attributes+16,y  ;for third row sprites and save
-           lda Sprite_Attributes+20,y
-           and #%00111111  
-           ora #%01000000              ;set horizontal flip bit for second
+           ;lda Sprite_Attributes+20,y
+           ;and #%00111111  
+           ;ora #%01000000              ;set horizontal flip bit for second
            sta Sprite_Attributes+20,y  ;sprite in the third row
-C_S_IGAtt: lda Sprite_Attributes+24,y
-           and #%00111111              ;mask out horizontal and vertical flip bits
+C_S_IGAtt: ;lda Sprite_Attributes+24,y
+           ;and #%00111111              ;mask out horizontal and vertical flip bits
            sta Sprite_Attributes+24,y  ;for fourth row sprites and save
-           lda Sprite_Attributes+28,y
-           and #%00111111
-           ora #%01000000              ;set horizontal flip bit for second
+           ;lda Sprite_Attributes+28,y
+           ;and #%00111111
+           ;ora #%01000000              ;set horizontal flip bit for second
            sta Sprite_Attributes+28,y  ;sprite in the fourth row
 ExPlyrAt:  rts                         ;leave
 

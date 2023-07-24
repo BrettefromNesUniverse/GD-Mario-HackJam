@@ -8442,10 +8442,10 @@ PlayerGfxTblOffsets:
 
 PlayerGraphicsTable:
 ;big player table
-      .db $00, $01, $02, $03, $04, $05, $06, $07 ;walking frame 1
-      .db $08, $09, $0a, $0b, $0c, $0d, $0e, $0f ;        frame 2
-      .db $10, $11, $12, $13, $14, $15, $16, $17 ;        frame 3
-      .db $18, $19, $1a, $1b, $1c, $1d, $1e, $1f ;skidding
+      .db $00, $00, $00, $00, $01, $03, $02, $04 ;walking frame 1
+      .db $00, $00, $00, $00, $0c, $0d, $0e, $0f ;        frame 2
+      .db $00, $00, $00, $00, $14, $15, $16, $17 ;        frame 3
+      .db $00, $00, $00, $00, $1c, $1d, $1e, $1f ;skidding
       .db $20, $21, $22, $23, $24, $25, $26, $27 ;jumping
       .db $08, $09, $28, $29, $2a, $2b, $2c, $2d ;swimming frame 1
       .db $08, $09, $0a, $0b, $0c, $30, $2c, $2d ;         frame 2
@@ -8456,11 +8456,11 @@ PlayerGraphicsTable:
       .db $08, $09, $28, $29, $2a, $2b, $0e, $0f ;fireball throwing
 
 ;small player table
-      .db $00, $00, $00, $00, $00, $00, $00, $00 ;walking frame 1
-      .db $00, $00, $00, $00, $00, $00, $00, $00 ;        frame 2
-      .db $00, $00, $00, $00, $00, $00, $00, $00 ;        frame 3
-      .db $00, $00, $00, $00, $00, $00, $00, $00 ;skidding
-      .db $00, $00, $00, $00, $00, $00, $00, $00 ;jumping
+      .db $fc, $fc, $fc, $fc, $00, $01, $10, $11 ;walking frame 1	| Neutral | Jump 1
+      .db $fc, $fc, $fc, $fc, $02, $03, $12, $13 ;        frame 2	| Jump 2 (H_FLIP = Jump 4)
+      .db $fc, $fc, $fc, $fc, $20, $21, $30, $31 ;        frame 3	| Jump 3
+      .db $fc, $fc, $fc, $fc, $04, $05, $14, $15 ;skidding			| Jump 4
+      .db $fc, $fc, $fc, $fc, $00, $01, $10, $11 ;jumping
       .db $00, $00, $00, $00, $00, $00, $00, $00 ;swimming frame 1
       .db $00, $00, $00, $00, $00, $00, $00, $00 ;         frame 2
       .db $00, $00, $00, $00, $00, $00, $00, $00 ;         frame 3
@@ -8469,7 +8469,7 @@ PlayerGraphicsTable:
       .db $fc, $fc, $fc, $fc, $9e, $9e, $9f, $9f ;killed
 
 ;used by both player sizes
-      .db $fc, $fc, $fc, $fc, $3a, $37, $4f, $4f ;small player standing
+      .db $fc, $fc, $fc, $fc, $00, $02, $01, $03 ;small player standing
       .db $fc, $fc, $00, $01, $4c, $4d, $4e, $4e ;intermediate grow frame
       .db $00, $01, $4c, $4d, $4a, $4a, $4b, $4b ;big player standing
 
