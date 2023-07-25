@@ -88,11 +88,11 @@ Palette1_MTiles:
   .db $be, $be, $bf, $bf ;tree trunk
   .db $75, $ba, $76, $bb ;mushroom stump top
   .db $ba, $ba, $bb, $bb ;mushroom stump bottom
-  .db $45, $47, $45, $47 ;breakable brick w/ line 
-  .db $47, $47, $47, $47 ;breakable brick 
-  .db $45, $47, $45, $47 ;breakable brick (not used)
+  .db $d0, $e0, $d1, $e1 ;Bottom Spike
+  .db $d2, $e2, $d3, $e3 ;Left Spike 
+  .db $d4, $e4, $d5, $e5 ;Top Spike
   .db $b4, $b6, $b5, $b7 ;cracked rock terrain
-  .db $45, $47, $45, $47 ;brick with line (power-up)
+  .db $d6, $e6, $d7, $e7 ;Right Spike
   .db $45, $47, $45, $47 ;brick with line (vine)
   .db $45, $47, $45, $47 ;brick with line (star)
   .db $45, $47, $45, $47 ;brick with line (coins)
@@ -104,7 +104,7 @@ Palette1_MTiles:
   .db $47, $47, $47, $47 ;brick (1-up)
   .db $24, $24, $24, $24 ;hidden block (1 coin)
   .db $24, $24, $24, $24 ;hidden block (1-up)
-  .db $ab, $ac, $ad, $ae ;solid block (3-d block)
+  .db $da, $ea, $db, $eb ;solid block (3-d block)	(custom)
   .db $5d, $5e, $5d, $5e ;solid block (white wall)
   .db $c1, $24, $c1, $24 ;bridge
   .db $c6, $c8, $c7, $c9 ;bullet bill cannon barrel

@@ -605,7 +605,7 @@ BGColorCtrl_Addr:
       .db $00, $09, $0a, $04
 
 BackgroundColors:
-      .db $22, $22, $0f, $0f ;used by area type if bg color ctrl not set
+      .db $22, $02, $0f, $0f ;used by area type if bg color ctrl not set
       .db $0f, $22, $0f, $0f ;used by background color control if set
 
 PlayerColors:
@@ -1179,7 +1179,7 @@ WaterPaletteData:
 GroundPaletteData:
   .db $3f, $00, $20
   .db $0f, $29, $1a, $0f
-  .db $0f, $36, $17, $0f
+  .db $0f, $20, $1f, $22
   .db $0f, $30, $21, $0f
   .db $0f, $27, $17, $0f
   .db $0f, $16, $27, $18
@@ -2972,11 +2972,11 @@ ChkWtr:    lda #$01                   ;set value here (apparently always set to 
            iny                        ;otherwise increment to 6
 GetYPhy:   lda #40; ,y       ;store appropriate jump/swim
            sta VerticalForce          ;data here
-           lda #144;FallMForceData,y
+           lda #125;FallMForceData,y
            sta VerticalForceDown
            lda #255 ^$ff ;Run;InitMForceData,y
            sta Player_Y_MoveForce
-           lda #-5;PlayerYSpdData,y
+           lda #-6;PlayerYSpdData,y
            sta Player_Y_Speed
            lda SwimmingFlag           ;if swimming flag disabled, branch
            beq PJumpSnd
@@ -3095,24 +3095,24 @@ LeftFrict: lda #$00    ;load value set here
            clc
            nop;adc FrictionAdderLow      ;add to it another value set here
            sta Player_X_MoveForce    ;store here
-           lda #$30
+           lda #$28
            nop;adc FrictionAdderHigh     ;add value plus carry to horizontal speed
            sta Player_X_Speed        ;set as new horizontal speed
            cmp MaximumRightSpeed     ;compare against maximum value for right movement
            bmi XSpdSign              ;if horizontal speed greater negatively, branch
-           lda #$30     ;otherwise set preset value as horizontal speed
+           lda #$28     ;otherwise set preset value as horizontal speed
            sta Player_X_Speed        ;thus slowing the player's left movement down
            jmp SetAbsSpd             ;skip to the end
 RghtFrict: lda #$00    ;load value set here
            sec
            nop;sbc FrictionAdderLow      ;subtract from it another value set here
            sta Player_X_MoveForce    ;store here
-           lda #$30
+           lda #$28
            nop;sbc FrictionAdderHigh     ;subtract value plus borrow from horizontal speed
            sta Player_X_Speed        ;set as new horizontal speed
            cmp MaximumLeftSpeed      ;compare against maximum value for left movement
            bpl XSpdSign              ;if horizontal speed greater positively, branch
-           lda #$30        ;otherwise set preset value as horizontal speed
+           lda #$28        ;otherwise set preset value as horizontal speed
            sta Player_X_Speed        ;thus slowing the player's right movement down
 XSpdSign:  cmp #$00                  ;if player not moving or moving to the right,
            bpl SetAbsSpd             ;branch and leave horizontal speed value unmodified
@@ -4787,7 +4787,7 @@ ShrPlF: lda PlayerGfxTblOffsets,y    ;get offset to graphics table based on offs
         rts                          ;and leave
 
 ChkForPlayerAttrib:
-           lda #%01000011;Player_SprDataOffset    ;get sprite data offset
+           lda #%01000000;Player_SprDataOffset    ;get sprite data offset
 		   ldy PlayerAnimCtrl;lda GameEngineSubroutine
 		   cpy #$04;cmp #$0b                    ;if executing specific game engine routine,
            beq Yesflip               ;branch to change third and fourth row OAM attributes

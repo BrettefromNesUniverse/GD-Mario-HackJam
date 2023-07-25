@@ -6415,9 +6415,10 @@ CheckForClimbMTiles:
 CheckForCoinMTiles:
          cmp #$c2              ;check for regular coin
          beq CoinSd            ;branch if found
-         cmp #$c3              ;check for underwater coin
-         beq CoinSd            ;branch if found
-         clc                   ;otherwise clear carry and leave
+         cmp #$57              ;check for underwater coin
+         bne +
+		 jmp InjurePlayer;CoinSd            ;branch if found
++:       clc                   ;otherwise clear carry and leave
          rts
 CoinSd:  lda #Sfx_CoinGrab
          sta Square2SoundQueue ;load coin grab sound and leave

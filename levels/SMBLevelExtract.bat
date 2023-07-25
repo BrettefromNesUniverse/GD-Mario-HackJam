@@ -1,4 +1,4 @@
 @echo off
-py %~dp0SMBLevelExtract.py "%*"
+python %~dp0SMBLevelExtract.py "%*"
 
 pause
