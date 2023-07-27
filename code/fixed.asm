@@ -2214,9 +2214,9 @@ WaterPipe:
       jsr GetLrgObjAttrib     ;get row and lower nybble
       ldy AreaObjectLength,x  ;get length (residual code, water pipe is 1 col thick)
       ldx $07                 ;get row
-      lda #$6b
-      sta MetatileBuffer,x    ;draw something here and below it
-      lda #$6c
+      ;lda #$6b
+      ;sta MetatileBuffer,x    ;draw something here and below it
+      lda #$60
       sta MetatileBuffer+1,x
       rts
 
@@ -2459,7 +2459,7 @@ CoinMetatileData:
 
 RowOfCoins:
       ldy AreaType            ;get area type
-      lda CoinMetatileData,y  ;load appropriate coin metatile
+      lda #$53;CoinMetatileData,y  ;load appropriate coin metatile
       jmp GetRow
 
 ;--------------------------------
@@ -2521,7 +2521,7 @@ DrawRow: ldx $07
 
 ColumnOfBricks:
       ldy AreaType          ;load area type obtained from area offset
-      lda BrickMetatiles,y  ;get metatile (no cloud override as for row)
+      lda #$55;BrickMetatiles,y  ;get metatile (no cloud override as for row)
       jmp GetRow2
 
 ColumnOfSolidBlocks:
@@ -6040,7 +6040,7 @@ HeadChk: lda Player_Y_Position       ;get player's vertical coordinate
          bcc DoFootCheck             ;if player is too high, skip this part
          jsr BlockBufferColli_Head   ;do player-to-bg collision detection on top of
          beq DoFootCheck             ;player, and branch if nothing above player's head
-         jsr CheckForCoinMTiles      ;check to see if player touched coin with their head
+         jmp InjurePlayer;jsr CheckForCoinMTiles      ;check to see if player touched coin with their head
          bcs AwardTouchedCoin        ;if so, branch to some other part of code
          ldy Player_Y_Speed          ;check player's vertical speed
          bpl DoFootCheck             ;if player not moving upwards, branch elsewhere
@@ -6153,6 +6153,7 @@ BHalf: ldy $eb                   ;load block adder offset
 ExSCH: rts                       ;leave
 
 CheckSideMTiles:
+		  jsr CheckForCoinMTiles
 		  jmp InjurePlayer
           beq ExCSM                  ;branch to leave if either found
           jsr CheckForClimbMTiles    ;check for climbable metatiles
@@ -6412,13 +6413,41 @@ CheckForClimbMTiles:
       cmp ClimbMTileUpperExt,x  ;compare current metatile with climbable metatiles
       rts
 
+InjurePlayerGate:
+		 pla 
+		 pla					;step back one return adress
+		 jmp InjurePlayer
+		 
+MaybeBouncePlayer:
+		lda A_B_Buttons
+		eor PreviousA_B_Buttons
+		and #A_Button
+		bne BouncePlayer
+		pla 
+		pla
+		rts
+BouncePlayer:
+		pla 
+		pla
+		jmp InitJS
+		 
 CheckForCoinMTiles:
          cmp #$c2              ;check for regular coin
          beq CoinSd            ;branch if found
-         cmp #$57              ;check for underwater coin
-         bne +
-		 jmp InjurePlayer;CoinSd            ;branch if found
-+:       clc                   ;otherwise clear carry and leave
+         cmp #$51              ;check for spikes
+         beq InjurePlayerGate
+		 cmp #$52
+		 beq InjurePlayerGate
+		 cmp #$53
+		 beq InjurePlayerGate
+		 cmp #$55
+		 beq InjurePlayerGate
+		                    ;otherwise clear carry and leave
+		 cmp #$5f	;bounce pad 
+		 beq BouncePlayer
+		 cmp #$60	;bounce orb
+		 beq MaybeBouncePlayer
+		 clc
          rts
 CoinSd:  lda #Sfx_CoinGrab
          sta Square2SoundQueue ;load coin grab sound and leave

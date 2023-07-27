@@ -91,7 +91,7 @@ Palette1_MTiles:
   .db $d0, $e0, $d1, $e1 ;Bottom Spike
   .db $d2, $e2, $d3, $e3 ;Left Spike 
   .db $d4, $e4, $d5, $e5 ;Top Spike
-  .db $b4, $b6, $b5, $b7 ;cracked rock terrain
+  .db $b4, $c4, $b5, $c5 ;cracked rock terrain
   .db $d6, $e6, $d7, $e7 ;Right Spike
   .db $45, $47, $45, $47 ;brick with line (vine)
   .db $45, $47, $45, $47 ;brick with line (star)
@@ -102,8 +102,8 @@ Palette1_MTiles:
   .db $47, $47, $47, $47 ;brick (star)
   .db $47, $47, $47, $47 ;brick (coins)
   .db $47, $47, $47, $47 ;brick (1-up)
-  .db $24, $24, $24, $24 ;hidden block (1 coin)
-  .db $24, $24, $24, $24 ;hidden block (1-up)
+  .db $24, $b0, $24, $b1 ;bounce pad;hidden block (1 coin)
+  .db $b2, $c2, $b3, $c3 ;hidden block (1-up)
   .db $da, $ea, $db, $eb ;solid block (3-d block)	(custom)
   .db $5d, $5e, $5d, $5e ;solid block (white wall)
   .db $c1, $24, $c1, $24 ;bridge
