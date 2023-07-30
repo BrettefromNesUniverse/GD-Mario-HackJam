@@ -5506,7 +5506,7 @@ ForceInjury:
           lda #$0a                  ;set subroutine to run on next frame
 SetKRout: ldy #$01                  ;set new player state
 SetPRout: sta GameEngineSubroutine  ;load new value to run subroutine on next frame
-          sty Player_State          ;store new player state
+          ;sty Player_State          ;store new player state
           ldy #$ff
           sty TimerControl          ;set master timer control flag to halt timers
           iny
@@ -8345,7 +8345,7 @@ DrawExplosion_Fireworks:
       jsr DumpFourSpr             ;and dump into tile number part of sprite data
       dey                         ;decrement Y so we have the proper offset again
       ldx ObjectOffset            ;return enemy object buffer offset to X
-      lda Fireball_Rel_YPos       ;get relative vertical coordinate
+      lda Player_Y_Position       ;get relative vertical coordinate
       sec                         ;subtract four pixels vertically
       sbc #$04                    ;for first and third sprites
       sta Sprite_Y_Position,y
@@ -8354,7 +8354,7 @@ DrawExplosion_Fireworks:
       adc #$08                    ;for second and fourth sprites
       sta Sprite_Y_Position+4,y
       sta Sprite_Y_Position+12,y
-      lda Fireball_Rel_XPos       ;get relative horizontal coordinate
+      lda Player_X_Position       ;get relative horizontal coordinate
       sec                         ;subtract four pixels horizontally
       sbc #$04                    ;for first and second sprites
       sta Sprite_X_Position,y
@@ -8487,16 +8487,16 @@ PlayerGraphicsTable:
 
 ;small player table
       .db $fc, $fc, $fc, $fc, $00, $01, $10, $11 ;walking frame 1	| Neutral | Jump 1
-      .db $fc, $fc, $fc, $fc, $02, $03, $12, $13 ;        frame 2	| Jump 2 (H_FLIP = Jump 4)
-      .db $fc, $fc, $fc, $fc, $20, $21, $30, $31 ;        frame 3	| Jump 3
       .db $fc, $fc, $fc, $fc, $04, $05, $14, $15 ;skidding			| Jump 4
+      .db $fc, $fc, $fc, $fc, $20, $21, $30, $31 ;        frame 3	| Jump 3
+      .db $fc, $fc, $fc, $fc, $02, $03, $12, $13 ;        frame 2	| Jump 2 (H_FLIP = Jump 4)
       .db $fc, $fc, $fc, $fc, $00, $01, $10, $11 ;jumping
       .db $00, $00, $00, $00, $00, $00, $00, $00 ;swimming frame 1
       .db $00, $00, $00, $00, $00, $00, $00, $00 ;         frame 2
       .db $00, $00, $00, $00, $00, $00, $00, $00 ;         frame 3
       .db $fc, $fc, $fc, $fc, $32, $33, $90, $91 ;climbing frame 1
       .db $fc, $fc, $fc, $fc, $3a, $37, $92, $93 ;         frame 2
-      .db $fc, $fc, $fc, $fc, $9e, $9e, $9f, $9f ;killed
+      .db $fc, $fc, $fc, $fc, $22, $23, $32, $33 ;killed
 
 ;used by both player sizes
       .db $fc, $fc, $fc, $fc, $00, $02, $01, $03 ;small player standing
