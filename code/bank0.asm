@@ -49,7 +49,7 @@ OperModeExecutionTree:
       lda OperMode     ;this is the heart of the entire program,
       jsr JumpEngine   ;most of what goes on starts here
 
-      .dw TitleScreenMode
+      .dw StartWorld1
       .dw GameMode
       .dw VictoryMode
       .dw GameOverMode
@@ -226,6 +226,8 @@ StartWorld1:  jsr LoadAreaPointer
               lda WorldSelectEnableFlag   ;if world select flag is on, then primary
               sta PrimaryHardMode         ;hard mode must be on as well
               lda #$00
+			  sta PlayerSize
+			  inc PlayerSize
               sta OperMode_Task           ;set game mode here, and clear demo timer
               sta DemoTimer
               ldx #$17
@@ -544,12 +546,12 @@ ScreenRoutines:
       jsr JumpEngine
     
       .dw InitScreen
-      .dw SetupIntermediate
+      .dw NoInter
       .dw WriteTopStatusLine
       .dw WriteBottomStatusLine
       .dw DisplayTimeUp
       .dw ResetSpritesAndScreenTimer
-      .dw DisplayIntermediate
+      .dw NoInter
       .dw ResetSpritesAndScreenTimer
       .dw AreaParserTaskControl
       .dw GetAreaPalette
@@ -672,13 +674,13 @@ NoAltPal:      jmp IncSubtask           ;now onto the next task
 
 WriteTopStatusLine:
       lda #$00          ;select main status bar
-      jsr WriteGameText ;output it
+      ;jsr WriteGameText ;output it
       jmp IncSubtask    ;onto the next task
 
 ;-------------------------------------------------------------------------------------
 
 WriteBottomStatusLine:
-      jsr GetSBNybbles        ;write player's score and coin tally to screen
+      jmp IncSubtask;jsr GetSBNybbles        ;write player's score and coin tally to screen
       ldx VRAM_Buffer1_Offset
       lda #$20                ;write address for world-area number on screen
       sta VRAM_Buffer1,x
@@ -732,7 +734,7 @@ DisplayIntermediate:
                bne NoInter                  ;and jump to specific task, otherwise
 PlayerInter:   jsr DrawPlayer_Intermediate  ;put player in appropriate place for
                lda #$01                     ;lives display, then output lives display to buffer
-OutputInter:   jsr WriteGameText
+OutputInter:   ;jsr WriteGameText
                jsr ResetScreenTimer
                lda #$00
                sta DisableScreenFlag        ;reenable screen output
@@ -740,7 +742,7 @@ OutputInter:   jsr WriteGameText
 GameOverInter: lda #$12                     ;set screen timer
                sta ScreenTimer
                lda #$03                     ;output game over screen to buffer
-               jsr WriteGameText
+               ;jsr WriteGameText
                jmp IncModeTask_B
 NoInter:       lda #$08                     ;set for specific task and leave
                sta ScreenRoutineTask
@@ -808,7 +810,7 @@ IncSubtask:  inc ScreenRoutineTask      ;move onto next task
 
 WriteTopScore:
                lda #$fa           ;run display routine to display top score on title
-               jsr UpdateNumber
+               ;jsr UpdateNumber
 IncModeTask_B: inc OperMode_Task  ;move onto next mode
                rts
 
@@ -2354,7 +2356,7 @@ GameRoutines:
       .dw PlayerCtrlRoutine
       .dw PlayerAutoRun
       .dw PlayerInjuryBlink
-      .dw PlayerDeath
+      .dw PlayerLoseLife
       .dw PlayerFireFlower
 
 ;-------------------------------------------------------------------------------------
@@ -3323,7 +3325,7 @@ ResGTCtrl: lda #timer_rate            ;reset game timer control
            sta DigitModifier+5
            jsr DigitsMathRoutine      ;do sub to decrement game timer slowly
            lda #$a4                   ;set status nybbles to update game timer display
-           jmp PrintStatusBarNumbers  ;do sub to update the display
+           rts;jmp PrintStatusBarNumbers  ;do sub to update the display
 TimeUpOn:  sta PlayerStatus           ;init player status (note A will always be zero here)
            jsr ForceInjury            ;do sub to kill the player (note player is small here)
            inc GameTimerExpiredFlag   ;set game timer expiration flag
@@ -3971,7 +3973,7 @@ GetSBNybbles:
       lda StatusBarNybbles,y ;get nybbles based on player, use to update score and coins
 
 UpdateNumber:
-        jsr PrintStatusBarNumbers ;print status bar numbers based on nybbles, whatever they be
+        ;jsr PrintStatusBarNumbers ;print status bar numbers based on nybbles, whatever they be
         ldy VRAM_Buffer1_Offset   
         lda VRAM_Buffer1-6,y      ;check highest digit of score
         bne NoZSup                ;if zero, overwrite with space tile for zero suppression

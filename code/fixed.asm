@@ -2017,7 +2017,7 @@ ScrollLockObject_Warp:
          inx                 ;(8-7-6) and move on
 WarpNum: txa
          sta WarpZoneControl ;store number here to be used by warp zone routine
-         jsr WriteGameText   ;print text and warp zone numbers
+         ;jsr WriteGameText   ;print text and warp zone numbers
          lda #PiranhaPlant
          jsr KillEnemies     ;load identifier for piranha plants and do sub
 
@@ -4605,7 +4605,7 @@ ELPGive: jsr DigitsMathRoutine  ;award 50 points per game timer interval
          asl
          asl
          ora #%00000100         ;add four to set nybble for game timer
-         jmp UpdateNumber       ;jump to print the new score and game timer
+         ;jmp UpdateNumber       ;jump to print the new score and game timer
 
 RaiseFlagSetoffFWorks:
          lda Enemy_Y_Position,x  ;check star flag's vertical position
