@@ -518,7 +518,7 @@ PutLives:      sta VRAM_Buffer1+8
                sty VRAM_Buffer1+19
                ldy LevelNumber
                iny
-               sty VRAM_Buffer1+21      ;we're done here
+               sty VRAM_Buffer1+21      ;we're done herePutLives
                rts
 
 CheckPlayerName:
@@ -824,8 +824,16 @@ NoInitCode:
 ;--------------------------------
 
 InitGoomba:
-      jsr InitNormalEnemy  ;set appropriate horizontal speed
-      jmp SmallBBox        ;set $09 as bounding box control, set other values
+               inc AreaNumber             ;otherwise initialize area number used as offset
+			   lda #$00
+               sta OperMode_Task          ;initialize secondary mode of operation
+               jsr LoadAreaPointer        ;get area address offset for the next area
+               inc FetchNewGameTimerFlag  ;set flag to load game timer from header
+               lda #GameModeValue
+               sta OperMode               ;set mode of operation to game mode
+               rts                        ;and leave
+      ;jsr InitNormalEnemy  ;set appropriate horizontal speed
+      ;jmp SmallBBox        ;set $09 as bounding box control, set other values
 
 ;--------------------------------
 
@@ -6040,8 +6048,9 @@ HeadChk: lda Player_Y_Position       ;get player's vertical coordinate
          bcc DoFootCheck             ;if player is too high, skip this part
          jsr BlockBufferColli_Head   ;do player-to-bg collision detection on top of
          beq DoFootCheck             ;player, and branch if nothing above player's head
-         jmp InjurePlayer;jsr CheckForCoinMTiles      ;check to see if player touched coin with their head
+         jsr CheckForCoinMTiles      ;check to see if player touched coin with their head
          bcs AwardTouchedCoin        ;if so, branch to some other part of code
+		 jmp InjurePlayer;
          ldy Player_Y_Speed          ;check player's vertical speed
          bpl DoFootCheck             ;if player not moving upwards, branch elsewhere
          ldy $04                     ;check lower nybble of vertical coordinate returned
@@ -6154,7 +6163,9 @@ ExSCH: rts                       ;leave
 
 CheckSideMTiles:
 		  jsr CheckForCoinMTiles
-		  jmp InjurePlayer
+		  bcc +
+		  jmp AwardTouchedCoin
++    	  jmp InjurePlayer
           beq ExCSM                  ;branch to leave if either found
           jsr CheckForClimbMTiles    ;check for climbable metatiles
           bcc ContSChk               ;if not found, skip and continue with code
