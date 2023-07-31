@@ -1756,13 +1756,13 @@ PlayerLoseLife:
              sta Sprite0HitDetectFlag
              lda #Silence             ;silence music
              sta EventMusicQueue
-             dec NumberofLives        ;take one life from player
-             bpl StillInGame          ;if player still has lives, branch
-             lda #$00
-             sta OperMode_Task        ;initialize mode task,
-             lda #GameOverModeValue   ;switch to game over mode
-             sta OperMode             ;and leave
-             rts
+             ;dec NumberofLives        ;take one life from player
+ ;            bpl StillInGame          ;if player still has lives, branch
+;             lda #$00
+  ;           sta OperMode_Task        ;initialize mode task,
+   ;          lda #GameOverModeValue   ;switch to game over mode
+    ;         sta OperMode             ;and leave
+     ;        rts
 StillInGame: lda WorldNumber          ;multiply world number by 2 and use
              asl                      ;as offset
              tax
@@ -1775,14 +1775,14 @@ GetHalfway:  ldy HalfwayPageNybbles,x ;get halfway page number with offset
              lsr
              tya                      ;if in area -2 or -4, use lower nybble
              bcs MaskHPNyb
-             lsr                      ;move higher nybble to lower if area
-             lsr                      ;number is -1 or -3
-             lsr
-             lsr
-MaskHPNyb:   and #%00001111           ;mask out all but lower nybble
-             cmp ScreenLeft_PageLoc
-             beq SetHalfway           ;left side of screen must be at the halfway page,
-             bcc SetHalfway           ;otherwise player must start at the
+          ;   lsr                      ;move higher nybble to lower if area
+          ;   lsr                      ;number is -1 or -3
+          ;   lsr
+           ;;  lsr
+MaskHPNyb:  ; and #%00001111           ;mask out all but lower nybble
+;             cmp ScreenLeft_PageLoc
+ ;            beq SetHalfway           ;left side of screen must be at the halfway page,
+  ;           bcc SetHalfway           ;otherwise player must start at the
              lda #$00                 ;beginning of the level
 SetHalfway:  sta HalfwayPage          ;store as halfway page for player
              jsr TransposePlayers     ;switch players around if 2-player game
@@ -2504,12 +2504,12 @@ HoleDie:    inx                         ;set flag in X for player death
             ldy GameEngineSubroutine
             cpy #$0b                    ;check for some other routine running
             beq ChkHoleX                ;if so, branch ahead
-            ldy DeathMusicLoaded        ;check value here
-            bne HoleBottom              ;if already set, branch to next part
-            iny
-            sty EventMusicQueue         ;otherwise play death music
-            sty DeathMusicLoaded        ;and set value here
-HoleBottom: ldy #$06
+           ; ldy DeathMusicLoaded        ;check value here
+          ;  bne HoleBottom              ;if already set, branch to next part
+           ; iny
+          ;  sty EventMusicQueue         ;otherwise play death music
+           ; sty DeathMusicLoaded        ;and set value here
+HoleBottom: ldy #$01
             sty $07                     ;change value here
 ChkHoleX:   cmp $07                     ;compare vertical high byte with value set here
             bmi ExitCtrl                ;if less, branch to leave
