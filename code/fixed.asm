@@ -410,6 +410,12 @@ DecTimersLoop: lda Timers,x              ;check current timer
 SkipExpTimer:  dex                       ;move onto next timer
                bpl DecTimersLoop         ;do this until all timers are dealt with
 NoDecTimers:   inc FrameCounter          ;increment frame counter
+			   pha 
+			   lda FrameCounter
+			   and #$00
+			   bne +
+			   jsr GetPlayerColors
++			   pla
 PauseSkip:     ldx #$00
                ldy #$07
                lda PseudoRandomBitReg    ;get first memory location of LSFR bytes

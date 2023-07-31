@@ -49,7 +49,7 @@ OperModeExecutionTree:
       lda OperMode     ;this is the heart of the entire program,
       jsr JumpEngine   ;most of what goes on starts here
 
-      .dw StartWorld1
+      .dw TitleScreenMode
       .dw GameMode
       .dw VictoryMode
       .dw GameOverMode
@@ -133,6 +133,8 @@ SprInitLoop:
 ;-------------------------------------------------------------------------------------
 
 TitleScreenMode:
+	  lda #$0c 
+	  sta GameEngineSubroutine
       lda OperMode_Task
       jsr JumpEngine
 
@@ -152,6 +154,7 @@ GameMenuRoutine:
               ora SavedJoypad2Bits        ;only the start button (either joypad)
               cmp #Start_Button
               beq StartGame
+			  rts
               cmp #A_Button+Start_Button  ;check to see if A + start was pressed
               bne ChkSelect               ;if not, branch to check select button
 StartGame:    jmp ChkContinue             ;if either start or A + start, execute here
@@ -159,10 +162,10 @@ ChkSelect:    cmp #Select_Button          ;check to see if the select button was
               beq SelectBLogic            ;if so, branch reset demo timer
               ldx DemoTimer               ;otherwise check demo timer
               bne ChkWorldSel             ;if demo timer not expired, branch to check world selection
-              sta SelectTimer             ;set controller bits here if running demo
-              jsr DemoEngine              ;run through the demo actions
-              bcs ResetTitle              ;if carry flag set, demo over, thus branch
-              jmp RunDemo                 ;otherwise, run game engine for demo
+              ;sta SelectTimer             ;set controller bits here if running demo
+              ;jsr DemoEngine              ;run through the demo actions
+              ;bcs ResetTitle              ;if carry flag set, demo over, thus branch
+              ;jmp RunDemo                 ;otherwise, run game engine for demo
 ChkWorldSel:  
 if world_select_enabled == 0
 			  ldx WorldSelectEnableFlag   ;check to see if world selection has been enabled
@@ -171,8 +174,8 @@ endif
               cmp #B_Button               ;if so, check to see if the B button was pressed
               bne NullJoypad
               iny                         ;if so, increment Y and execute same code as select
-SelectBLogic: lda DemoTimer               ;if select or B pressed, check demo timer one last time
-              beq ResetTitle              ;if demo timer expired, branch to reset title screen mode
+SelectBLogic: ;lda DemoTimer               ;if select or B pressed, check demo timer one last time
+              ;beq ResetTitle              ;if demo timer expired, branch to reset title screen mode
               lda #$18                    ;otherwise reset demo timer
               sta DemoTimer
               lda SelectTimer             ;check select/B button timer
@@ -213,7 +216,7 @@ ResetTitle:   lda #$00                    ;reset game modes, disable
               inc DisableScreenFlag
               rts
 ChkContinue:  ldy DemoTimer               ;if timer for demo has expired, reset modes
-              beq ResetTitle
+              ;beq ResetTitle
               asl                         ;check to see if A button was also pushed
               bcc StartWorld1             ;if not, don't load continue function's world number
               lda ContinueWorld           ;load previously saved world number for secret
@@ -275,19 +278,6 @@ DemoTimingData:
       .db $80, $20, $30, $30, $01, $ff, $00
 
 DemoEngine:
-          ldx DemoAction         ;load current demo action
-          lda DemoActionTimer    ;load current action timer
-          bne DoAction           ;if timer still counting down, skip
-          inx
-          inc DemoAction         ;if expired, increment action, X, and
-          sec                    ;set carry by default for demo over
-          lda DemoTimingData-1,x ;get next timer
-          sta DemoActionTimer    ;store as current timer
-          beq DemoOver           ;if timer already at zero, skip
-DoAction: lda DemoActionData-1,x ;get and perform action (current or next)
-          sta SavedJoypad1Bits
-          dec DemoActionTimer    ;decrement action timer
-          clc                    ;clear carry if demo still going
 DemoOver: rts
 
 ;-------------------------------------------------------------------------------------
@@ -606,9 +596,11 @@ NextSubtask:   jmp IncSubtask           ;move onto next task
 BGColorCtrl_Addr:
       .db $00, $09, $0a, $04
 
+      .db $02, $12, $22, $32 ;used by area type if bg color ctrl not set
+      .db $33, $23, $13, $03 ;used by background color control if set
 BackgroundColors:
-      .db $22, $02, $0f, $0f ;used by area type if bg color ctrl not set
-      .db $0f, $22, $0f, $0f ;used by background color control if set
+      .db $22, $12, $02, $03 ;used by area type if bg color ctrl not set
+      .db $13, $23, $33, $32 ;used by background color control if set
 
 PlayerColors:
       .db $22, $1e, $22, $29 ;mario's colors
@@ -643,7 +635,12 @@ ClrGetLoop:    lda PlayerColors,y       ;fetch player colors and store them
                ldx VRAM_Buffer1_Offset  ;load original offset from before
                ldy BackgroundColorCtrl  ;if this value is four or greater, it will be set
                bne SetBGColor           ;therefore use it as offset to background color
-               ldy AreaType             ;otherwise use area type bits from area offset as offset
+               lda FrameCounter             ;otherwise use area type bits from area offset as offset
+			   lsr 
+			   lsr 
+			   lsr
+			   and #$07
+			   tay
 SetBGColor:    lda BackgroundColors,y   ;to background color instead
                sta VRAM_Buffer1+3,x
                lda #$3f                 ;set for sprite palette address
@@ -2357,7 +2354,7 @@ GameRoutines:
       .dw PlayerAutoRun
       .dw PlayerInjuryBlink
       .dw PlayerLoseLife
-      .dw PlayerFireFlower
+      .dw PlayerStayStill
 
 ;-------------------------------------------------------------------------------------
 
@@ -2646,13 +2643,10 @@ DonePlayerTask:
       sta GameEngineSubroutine  ;set player control routine to run next frame
       rts                       ;leave
 
-PlayerFireFlower: 
-      lda TimerControl       ;check master timer control
-      cmp #$c0               ;for specific moment in time
-      beq ResetPalFireFlower ;branch if at moment, not before or after
-      lda FrameCounter       ;get frame counter
-      lsr
-      lsr                    ;divide by four to change every four frames
+PlayerStayStill: 
+      lda #$00
+	  sta SavedJoypad1Bits
+	  jmp AutoControlPlayer
 
 CyclePlayerPalette:
       and #$03              ;mask out all but d1-d0 (previously d3-d2)

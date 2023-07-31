@@ -88,11 +88,11 @@ Palette1_MTiles:
   .db $be, $be, $bf, $bf ;tree trunk
   .db $75, $ba, $76, $bb ;mushroom stump top
   .db $ba, $ba, $bb, $bb ;mushroom stump bottom
-  .db $d0, $e0, $d1, $e1 ;Bottom Spike
-  .db $d2, $e2, $d3, $e3 ;Left Spike 
-  .db $d4, $e4, $d5, $e5 ;Top Spike
-  .db $b4, $c4, $b5, $c5 ;cracked rock terrain
-  .db $d6, $e6, $d7, $e7 ;Right Spike
+  .db $70, $80, $71, $81 ;Bottom Spike
+  .db $7a, $8a, $7b, $8b ;Left Spike 
+  .db $78, $88, $79, $89 ;Top Spike
+  .db $58, $68, $59, $69 ;cracked rock terrain
+  .db $76, $86, $77, $87 ;Right Spike
   .db $45, $47, $45, $47 ;brick with line (vine)
   .db $45, $47, $45, $47 ;brick with line (star)
   .db $45, $47, $45, $47 ;brick with line (coins)
@@ -102,9 +102,9 @@ Palette1_MTiles:
   .db $47, $47, $47, $47 ;brick (star)
   .db $47, $47, $47, $47 ;brick (coins)
   .db $47, $47, $47, $47 ;brick (1-up)
-  .db $24, $b0, $24, $b1 ;bounce pad;hidden block (1 coin)
-  .db $b2, $c2, $b3, $c3 ;hidden block (1-up)
-  .db $da, $ea, $db, $eb ;solid block (3-d block)	(custom)
+  .db $24, $50, $24, $51 ;bounce pad;hidden block (1 coin)
+  .db $52, $62, $53, $63 ;flag ball (residual object) ;hidden block (1-up)
+  .db $7e, $8e, $7f, $8f ;solid block (3-d block)	(custom)
   .db $5d, $5e, $5d, $5e ;solid block (white wall)
   .db $c1, $24, $c1, $24 ;bridge
   .db $c6, $c8, $c7, $c9 ;bullet bill cannon barrel
@@ -116,7 +116,7 @@ Palette1_MTiles:
   .db $24, $47, $24, $47 ;half brick (???)
   .db $86, $8a, $87, $8b ;water pipe top
   .db $8e, $91, $8f, $92 ;water pipe bottom
-  .db $24, $2f, $24, $3d ;flag ball (residual object)
+  .db $52, $62, $53, $63 ;flag ball (residual object)
 
 Palette2_MTiles:
   .db $24, $24, $24, $35 ;cloud left
